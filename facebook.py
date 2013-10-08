@@ -33,7 +33,6 @@ if user:
     friends = graph.get_connections("me", "friends")
 
 """
-import httplib
 import hashlib
 import hmac
 import base64
