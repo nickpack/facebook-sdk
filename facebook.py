@@ -419,7 +419,7 @@ class GraphAPI(object):
             )
 
         try:
-            content = file.read().decode("utf-8")
+            content = fql_file.read().decode("utf-8")
 
             response = _parse_json(content)
             #Return a list if success, return a dictionary if failed
