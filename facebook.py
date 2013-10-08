@@ -33,9 +33,6 @@ if user:
     friends = graph.get_connections("me", "friends")
 
 """
-
-import urllib
-import urllib2
 import httplib
 import hashlib
 import hmac
@@ -60,7 +57,7 @@ else:
 
 # Find a query string parser
 if six.PY3:
-    from urllib.parse import parse_qs
+    from parse import parse_qs
 else:
     try:
         from urlparse import parse_qs
@@ -69,9 +66,9 @@ else:
 
 # Find urlopen and other http facilities
 if six.PY3:
-    from urllib.parse import urlencode
-    from urllib.request import Request, urlopen
-    from urllib.error import HTTPError
+    from parse import urlencode
+    from request import Request, urlopen
+    from error import HTTPError
 else:
     from urllib import urlencode
     from urllib2 import urlopen, Request, HTTPError
@@ -252,7 +249,7 @@ class GraphAPI(object):
         }
         post_args.update(kwargs)
         content_type, body = self._encode_multipart_form(post_args)
-        req = urllib2.Request(
+        req = Request(
             "https://graph.facebook.com/%s/photos" % object_id,
             data=body
         )
@@ -334,8 +331,8 @@ class GraphAPI(object):
                 args["access_token"] = self.access_token
         post_data = None if post_args is None else urlencode(post_args)
         try:
-            graph_file = urllib2.urlopen(
-                "https://graph.facebook.com/%s?%s" % (path, urllib.urlencode(args)),
+            graph_file = urlopen(
+                "https://graph.facebook.com/%s?%s" % (path, urlencode(args)),
                 post_data,
                 timeout=self.timeout
             )
@@ -347,8 +344,8 @@ class GraphAPI(object):
             if self.timeout:
                 socket.setdefaulttimeout(self.timeout)
 
-            graph_file = urllib2.urlopen(
-                "https://graph.facebook.com/%s?%s" % (path, urllib.urlencode(args)),
+            graph_file = urlopen(
+                "https://graph.facebook.com/%s?%s" % (path, urlencode(args)),
                 post_data
             )
         try:
@@ -401,9 +398,9 @@ class GraphAPI(object):
         args["format"] = "json"
 
         try:
-            fql_file = urllib2.urlopen(
+            fql_file = urlopen(
                 "https://graph.facebook.com/fql?%s" %
-                urllib.urlencode(args),
+                urlencode(args),
                 post_data,
                 timeout=self.timeout
             )
@@ -412,9 +409,9 @@ class GraphAPI(object):
             if self.timeout:
                 socket.setdefaulttimeout(self.timeout)
 
-            fql_file = urllib2.urlopen(
+            fql_file = urlopen(
                 "https://graph.facebook.com/fql?%s" %
-                urllib.urlencode(args),
+                urlencode(args),
                 post_data
             )
 
@@ -446,9 +443,10 @@ class GraphAPI(object):
             "fb_exchange_token": self.access_token,
         }
 
-        response = urllib.urlopen("https://graph.facebook.com/oauth/"
-                                  "access_token?%s" %
-                                  urlencode(args)).read().decode("utf-8")
+        response = urlopen(
+            "https://graph.facebook.com/oauth/access_token?%s" %
+            urlencode(args)
+        ).read().decode("utf-8")
 
         query_str = parse_qs(response)
         if "access_token" in query_str:
@@ -590,8 +588,10 @@ def get_access_token_from_code(code, redirect_uri, app_id, app_secret):
     }
     # We would use GraphAPI.request() here, except for that the fact
     # that the response is a key-value pair, and not JSON.
-    response = urllib.urlopen("https://graph.facebook.com/oauth/access_token?%s" %
-                              urllib.urlencode(args)).read()
+    response = urlopen(
+        "https://graph.facebook.com/oauth/access_token?%s" %
+        urlencode(args)
+    ).read()
     query_str = parse_qs(response)
     if "access_token" in query_str:
         result = {"access_token": query_str["access_token"][0]}
@@ -620,8 +620,10 @@ def get_app_access_token(app_id, app_secret):
             'client_id': app_id,
             'client_secret': app_secret}
 
-    access_token_file = urllib2.urlopen("https://graph.facebook.com/oauth/access_token?%s" %
-                                        urllib.urlencode(args))
+    access_token_file = urlopen(
+        "https://graph.facebook.com/oauth/access_token?%s" %
+        urlencode(args)
+    )
 
     try:
         result = access_token_file.read().split("=")[1]
