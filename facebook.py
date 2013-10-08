@@ -57,7 +57,7 @@ else:
 
 # Find a query string parser
 if six.PY3:
-    from parse import parse_qs
+    from urllib.parse import parse_qs
 else:
     try:
         from urlparse import parse_qs
@@ -66,9 +66,9 @@ else:
 
 # Find urlopen and other http facilities
 if six.PY3:
-    from parse import urlencode
-    from request import Request, urlopen
-    from error import HTTPError
+    from urllib.parse import urlencode
+    from urllib.request import Request, urlopen
+    from urllib.error import HTTPError
 else:
     from urllib import urlencode
     from urllib2 import urlopen, Request, HTTPError
@@ -78,6 +78,7 @@ if six.PY3:
     import http.client as httplib
 else:
     import httplib
+
 
 class GraphAPI(object):
     """
